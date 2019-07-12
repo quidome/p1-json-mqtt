@@ -1,14 +1,3 @@
-/*
- * Permission is hereby granted, free of charge, to anyone
- * obtaining a copy of this document and accompanying files,
- * to do whatever they want with them without any restriction,
- * including, but not limited to, copying, modification and redistribution.
- * NO WARRANTY OF ANY KIND IS PROVIDED.
- *
- * Example that shows how to periodically read a P1 message from a
- * serial port and automatically print the result.
-*/
-
 #include <Arduino.h>
 #include <ArduinoJson.h>
 #include "WiFi.h"
@@ -32,9 +21,9 @@
 #define COOLDOWN 10 * 1000    // time in msec between reading RX_PIN for messages
 
 
-
-
-int status = WL_IDLE_STATUS;
+int status = WL_IDLE_STATUS;                        // wifi status
+unsigned long last;                                 // timestamp of last read telegram
+const size_t capacity = JSON_OBJECT_SIZE(24) + 660; // json document size
 
 // setup connectivity
 WiFiClient espClient; 
@@ -44,8 +33,6 @@ PubSubClient client(espClient);
 HardwareSerial Serial_in(2);
 P1Reader reader(&Serial_in, RTS_PIN);
 
-unsigned long last;
-const size_t capacity = JSON_OBJECT_SIZE(24) + 660;
 
 // mqtt connectivity
 void check_connect_mqtt() {
@@ -58,10 +45,6 @@ void check_connect_mqtt() {
     // Attempt to connect
     if (client.connect(clientId.c_str())) {
       Serial.println("connected");
-      // Once connected, publish an announcement...
-      // client.publish("/logging/", "hello world");
-      // ... and resubscribe
-      // client.subscribe("inTopic");
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
@@ -72,6 +55,8 @@ void check_connect_mqtt() {
   }
 }
 
+
+// write_to_mqtt
 void write_to_mqtt(String message, String topic=MQTT_TOPIC) {
   int topic_size = topic.length() + 1;
   int message_size = message.length() +1;
@@ -269,7 +254,7 @@ void processData(MyData DSMR_data) {
     doc["gas_delivered"] = DSMR_data.gas_delivered.val();
   }
 
-  // output to serial 
+  // serialize json document into String
   String json_output;
   serializeJsonPretty(doc, json_output);
 
@@ -283,7 +268,7 @@ void processData(MyData DSMR_data) {
 }
 
 
-// simple flash function
+// simple led flash function
 void flash_led(int led_pin=LED_BUILTIN, int led_on_msec=100) {
   digitalWrite(led_pin, HIGH);
   delay(led_on_msec);
