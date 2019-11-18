@@ -6,8 +6,6 @@
 #include "secrets.h"
 
 // project stuff
-#define PROJECT "github.com:quidome/p1-json-mqtt"
-#define VERSION "0.1.0"
 #define PURPOSE "reading p1 messages and ship them to mqtt in json"
 
 #define VERBOSE 0
