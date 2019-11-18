@@ -7,7 +7,6 @@
 
 // project stuff
 #define PURPOSE "reading p1 messages and ship them to mqtt in json"
-
 #define VERBOSE 0
 
 // board configuration
@@ -18,8 +17,9 @@
 #define RTS_PIN 4
 #define COOLDOWN 10 * 1000    // time in msec between reading RX_PIN for messages
 
-
+#define WIFI_WAIT 10 * 1000   // time in msec to wait before checking wifi
 int status = WL_IDLE_STATUS;                        // wifi status
+unsigned long check_wifi = WIFI_WAIT;
 unsigned long last;                                 // timestamp of last read telegram
 const size_t capacity = JSON_OBJECT_SIZE(24) + 660; // json document size
 
@@ -273,10 +273,9 @@ void flash_led(int led_pin=LED_BUILTIN, int led_on_msec=100) {
 }
 
 
-void setup_wifi() {
-  WiFi.setHostname(hostname);
+void connect_wifi() {
   while (status != WL_CONNECTED) {
-    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.print("connecting to WPA SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network:
     status = WiFi.begin(ssid, password);
@@ -284,12 +283,51 @@ void setup_wifi() {
     // wait 10 seconds for connection:
     delay(10000);
   }
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
+}
+
+
+void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
+{
+    Serial.println("Connected to AP!");
+ 
+    Serial.print("SSID: ");
+    for(int i=0; i<info.connected.ssid_len; i++){
+      Serial.print((char) info.connected.ssid[i]);
+    }
+ 
+    Serial.print("\nBSSID: ");
+    for(int i=0; i<6; i++){
+      Serial.printf("%02X", info.connected.bssid[i]);
+ 
+      if(i<5){
+        Serial.print(":");
+      }
+    }
+    Serial.println();
+} 
+
+
+void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info) {
   Serial.print("IP: ");
   Serial.println(WiFi.localIP());
   Serial.print("DNS: ");
   Serial.println(WiFi.dnsIP());
+}
+
+
+void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
+  Serial.println("ja lekker, ben disconnected");
+  // WiFi.disconnect();
+  // connect_wifi();
+}
+
+
+void setup_wifi() {
+  WiFi.setHostname(hostname);
+  WiFi.onEvent(WiFiStationConnected, SYSTEM_EVENT_STA_CONNECTED);
+  WiFi.onEvent(WiFiGotIP, SYSTEM_EVENT_STA_GOT_IP);
+  WiFi.onEvent(WiFiStationDisconnected, SYSTEM_EVENT_STA_DISCONNECTED);
+  connect_wifi();
 }
 
 
