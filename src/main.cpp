@@ -6,11 +6,11 @@
 #include "secrets.h"
 
 // project stuff
-#define PROJECT "p1-json-mqtt"
+#define PROJECT "github.com:quidome/p1-json-mqtt"
 #define VERSION "0.1.0"
 #define PURPOSE "reading p1 messages and ship them to mqtt in json"
 
-#define VERBOSE 1
+#define VERBOSE 0
 
 // board configuration
 #define DEFAULT_BAUDRATE 115200
@@ -54,7 +54,6 @@ void check_connect_mqtt() {
     }
   }
 }
-
 
 // write_to_mqtt
 void write_to_mqtt(String message, String topic=MQTT_TOPIC) {
@@ -304,6 +303,7 @@ void setup() {
   Serial.begin(DEFAULT_BAUDRATE);
   Serial.println((String)"project: " + PROJECT);
   Serial.println((String)"version: " + VERSION);
+  Serial.println((String)"git-rev: " + PIO_SRC_REV);
   Serial.println(PURPOSE);
 
   Serial_in.begin(DEFAULT_BAUDRATE);
