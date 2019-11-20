@@ -308,15 +308,16 @@ void WiFiStationConnected(WiFiEvent_t event, WiFiEventInfo_t info)
 
 
 void WiFiGotIP(WiFiEvent_t event, WiFiEventInfo_t info) {
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
-  Serial.print("DNS: ");
-  Serial.println(WiFi.dnsIP());
+  Serial.println("IP : " + WiFi.localIP().toString());
+  Serial.println("DNS: " + WiFi.dnsIP().toString());
 }
 
 
+// This function is called when station disconnected event triggers
+//  just running a reconnect won't work. Needs to be smarter
+// TODO: proper reconnect code
 void WiFiStationDisconnected(WiFiEvent_t event, WiFiEventInfo_t info) {
-  Serial.println("ja lekker, ben disconnected");
+  Serial.println("station disconnected");
   // WiFi.disconnect();
   // connect_wifi();
 }
