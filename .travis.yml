@@ -37,6 +37,8 @@ install:
     - pip install -U platformio
     - platformio update
 
+    - platformio lib -g install 64 5702 617 89
+
 script:
     - platformio run
 
