@@ -41,6 +41,10 @@ install:
 
     # copy secrets example to expected secrets.h file 
     - cp lib/Secrets/secrets_example.h lib/Secrets/secrets.h
+    - ls ${REPO}
+    - ls 
+
+
 
 script:
     - platformio run
