@@ -39,8 +39,8 @@ install:
 
     - platformio lib -g install 64 5702 617 89
 
-    - pwd
-    - ls ${REPO}
+    # copy secrets example to expected secrets.h file 
+    - cp ${REPO}/lib/Secrets/secrets_example.h ${REPO}/lib/Secrets/secrets.h
 
 script:
     - platformio run
