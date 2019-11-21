@@ -42,7 +42,7 @@ install:
     # copy secrets example to expected secrets.h file 
     # - cp lib/Secrets/secrets_example.h lib/Secrets/secrets.h
     - env
-    - ls ${TRAVIS_BUILD_DIR}/lib/Secrets/
+    - ls ${TRAVIS_BUILD_DIR}/lib/Secrets/src/secrets_example.h
 
 
 
