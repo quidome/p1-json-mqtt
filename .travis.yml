@@ -39,6 +39,9 @@ install:
 
     - platformio lib -g install 64 5702 617 89
 
+    - pwd
+    - ls ${REPO}
+
 script:
     - platformio run
 
