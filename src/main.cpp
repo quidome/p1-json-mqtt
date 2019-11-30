@@ -20,7 +20,9 @@
 #define WIFI_WAIT 10 * 1000   // time in msec to wait before checking wifi
 int status = WL_IDLE_STATUS;                        // wifi status
 unsigned long check_wifi = WIFI_WAIT;
+unsigned long loop_start;                           // mark loop timestamp 
 unsigned long last;                                 // timestamp of last read telegram
+unsigned long last_wifi;                            // timestamp of last read telegram
 const size_t capacity = JSON_OBJECT_SIZE(24) + 660; // json document size
 
 // setup connectivity
@@ -274,6 +276,7 @@ void flash_led(int led_pin=LED_BUILTIN, int led_on_msec=100) {
 
 
 void connect_wifi() {
+  status = WiFi.status();
   while (status != WL_CONNECTED) {
     Serial.print("connecting to WPA SSID: ");
     Serial.println(ssid);
@@ -356,18 +359,30 @@ void setup() {
   // start a read right away
   reader.enable(true);
   last = millis();
+  last_wifi = millis();
 }
 
 
 void loop () {
+  // mark loop entry time
+  loop_start = millis();
+
   // Allow the reader to check the serial buffer regularly
   reader.loop();
 
   // Every minute, fire off a one-off reading
-  unsigned long now = millis();
-  if (now - last > COOLDOWN) {
+  if (loop_start - last > COOLDOWN) {
     reader.enable(true);
-    last = now;
+    last = loop_start;
+  }
+
+  // Every minute, check wifi connection
+  if (loop_start - last_wifi > COOLDOWN) {
+    if (VERBOSE) {
+      Serial.println("entering wifi check loop");
+    }
+    connect_wifi();
+    last_wifi = loop_start;
   }
 
   if (reader.available()) {
